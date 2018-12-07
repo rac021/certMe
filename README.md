@@ -52,13 +52,13 @@ Automatic generation of let's Encrypt Certificates
 
 ** Requirements  : openssl installed + server reacheable from the web on the port 80
 
-Ex Command       :  java -jar certMe.jar         \
-                         -outCertificate /opt/    \
-                         -challenge /war/www/html \
-                         -password crackeme       \
-                         -staging  PROD           \
-                         -alias jaxy              \
-                         -jks  -alias jaxy     
+Ex Command       :  java -jar certMe.jar          \
+                          -outCertificate /opt/    \
+                          -challenge /war/www/html \
+                          -password crackeme       \
+                          -staging  PROD           \
+                          -alias jaxy              \
+                          -jks  -alias jaxy     
 ```
 
 **Upcoming Features :**
