@@ -40,9 +40,11 @@ Automatic generation of let's Encrypt Certificates
                    EX : /war/www/html                   
 -outCertificate =  Where certificates will be generated ( include name of the certificate in the path ).
 -password       =  password of the PKCS12 File.
--phrase         =  password of the JKS File ( optional, if not provided, it will be the same as the -password ).
+-phrase         =  password of the JKS File 
+                   ( optional, if not provided, it will be the same as the -password ).
 -password       =  password of the PKCS12 File.
--phrase         =  password of the JKS File ( optional, if not provided, it will be the same as the -password ).
+-phrase         =  password of the JKS File
+                   ( optional, if not provided, it will be the same as the -password ).
 -staging        =  Generate DEV / PROD Certificates ( By default : DEV ).
                    Nb : Only 50 PROD certificates are generated / Week
 -jks            =  Import PKS12 into JKS  ( Java KeyStore ), ( Boolean. Disabled by default ).
@@ -59,4 +61,9 @@ Ex Command       :  java -jar certMe.jar         \
                          -jks  -alias jaxy     
 ```
 
+**Upcoming Features :**
 
+    - Get rid of OpenSSL
+    - Get rid of the web server 
+    
+    
