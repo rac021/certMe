@@ -9,7 +9,7 @@ Automatic generation of let's Encrypt Certificates
    
 - **Requirements** : 
 
-  `openssl installed a server reacheable from the web on the port 80 or 443 ( if tls is activated )`
+  `openssl installed  + A server reacheable from the web on the port 80 or 443 ( if tls is activated )`
 
 
 - **Command Example** :
