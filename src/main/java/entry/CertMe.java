@@ -68,7 +68,7 @@ public class CertMe {
     private enum ChallengeType { HTTP, DNS    }
     
     // Challenge type to be used
-    private static final ChallengeType CHALLENGE_TYPE = ChallengeType.HTTP             ;
+    private static final ChallengeType CHALLENGE_TYPE = ChallengeType.HTTP   ;
     
     private static final Logger LOG = LoggerFactory.getLogger(CertMe.class ) ;
     
@@ -90,7 +90,7 @@ public class CertMe {
 
         Session session = null ;
         
-        if( STAGING.equalsIgnoreCase("PROD") ) {
+        if( STAGING.equalsIgnoreCase("PROD") )             {
            session = new Session("acme://letsencrypt.org") ;
         }
         else {
@@ -140,7 +140,7 @@ public class CertMe {
                 TimeUnit.SECONDS.sleep(3) ;
 
                 // Then update the status
-                order.update() ;
+                order.update()            ;
             }
             
         } catch (InterruptedException ex)       {
@@ -158,7 +158,7 @@ public class CertMe {
         LOG.info("Certificate URL : " + certificate.getLocation())                             ;
 
          //Write a combined file containing the certificate and chain.
-        try (FileWriter fw = new FileWriter(  DOMAIN_CHAIN_FILE)) {
+        try ( FileWriter fw = new FileWriter(  DOMAIN_CHAIN_FILE ) ) {
             certificate.writeCertificate(fw) ;
         }
     }
@@ -199,13 +199,13 @@ public class CertMe {
      */
     private KeyPair loadOrCreateDomainKeyPair() throws IOException {
         if (DOMAIN_KEY_FILE.exists()) {
-            try (FileReader fr = new FileReader(DOMAIN_KEY_FILE)) {
+            try (FileReader fr = new FileReader(DOMAIN_KEY_FILE))  {
                 return KeyPairUtils.readKeyPair(fr) ;
             }
         } else {
-            KeyPair domainKeyPair = KeyPairUtils.createKeyPair(KEY_SIZE);
-            try (FileWriter fw = new FileWriter(DOMAIN_KEY_FILE)) {
-                KeyPairUtils.writeKeyPair(domainKeyPair, fw) ;
+            KeyPair domainKeyPair = KeyPairUtils.createKeyPair(KEY_SIZE) ;
+            try (FileWriter fw = new FileWriter(DOMAIN_KEY_FILE))        {
+                KeyPairUtils.writeKeyPair(domainKeyPair, fw)             ;
             }
             return domainKeyPair ;
         }
@@ -446,8 +446,7 @@ public class CertMe {
         } catch (Exception ex) {
             throw  ex          ;
         }
-    }
-    
+    }    
     
     /**   @param domain
      *    @param targetChalengeToResolve
@@ -461,7 +460,8 @@ public class CertMe {
             // Command to install cacerts in /etc/ssl/certs/java
             // sudo dpkg --purge --force-depends ca-certificates-java
             // sudo apt-get install ca-certificates-java
-            boolean minVarsion_111 = System.getProperty("java.runtime.version").contains("0_111") ;
+            boolean minVarsion_111 = System.getProperty("java.runtime.version")
+		                           .contains("0_111")                 ;
             
             if (minVarsion_111 )                                                       {
                     
@@ -623,44 +623,46 @@ public class CertMe {
         if( domain == null ||  password == null )  {  printHelp()   ;    }
         
         String outCertificateFolder   = new File(CertMe.class.getProtectionDomain()
-                                                                .getCodeSource()
-                                                                .getLocation().getPath())
-                                                                .getParentFile()
-                                                                .getPath() + File.separator ;
+                                                             .getCodeSource()
+                                                             .getLocation().getPath())
+                                                             .getParentFile()
+                                                             .getPath() + File.separator ;
         String outCertificateFileName = "app_cert.p12" ;
         
-        if( outCertificate == null || 
+        if ( outCertificate == null || 
             outCertificate.trim().equalsIgnoreCase(outCertificateFolder.trim()) )  {
             
-            outCertificate  =   outCertificateFolder ;
+            outCertificate  =  outCertificateFolder ;
             
         } else {
             
             if ( Files.isRegularFile(Paths.get(outCertificate)))               {
-                File out =  new File( outCertificate )                         ;
+                File out               =  new File( outCertificate )           ;
                 outCertificateFolder   = out.getParentFile().getAbsolutePath() ;
                 outCertificateFileName = out.getName()                         ;
             }
             
-            else if( Files.isDirectory(Paths.get(outCertificate)) )                        {
+            else if ( Files.isDirectory(Paths.get(outCertificate)) )                       {
                 outCertificateFolder = outCertificate                                      ;
                 outCertificate       =   ( outCertificateFolder.endsWith ( File.separator) ?
-                                          outCertificateFolder.trim() :
-                                          outCertificateFolder.trim() + File.separator ) 
+                                           outCertificateFolder.trim() :
+                                           outCertificateFolder.trim() + File.separator    ) 
                                           + outCertificateFileName                         ;
+            }
         }
-        }
-        if( ! outCertificateFolder.endsWith( File.separator ) )                 { 
+	    
+        if ( ! outCertificateFolder.endsWith( File.separator ) )                { 
            outCertificateFolder = outCertificateFolder.trim() + File.separator  ;
         }
-          // File name of the User Key Pair
+
+         // File name of the User Key Pair
         USER_KEY_FILE = new File( outCertificateFolder   + outCertificateFileName +"_user.key")     ;
 
         // File name of the Domain Key Pair
         DOMAIN_KEY_FILE = new File( outCertificateFolder + outCertificateFileName + "_domain.key")  ;
 
         // File name of the CSR
-        DOMAIN_CSR_FILE = new File( outCertificateFolder  + outCertificateFileName + "_domain.csr") ;
+        DOMAIN_CSR_FILE = new File( outCertificateFolder + outCertificateFileName + "_domain.csr")  ;
 
         // File name of the signed certificate
         DOMAIN_CHAIN_FILE = new File( outCertificateFolder + outCertificateFileName + "_domain-chain.crt")      ;
@@ -673,3 +675,4 @@ public class CertMe {
         
     }
 }
+
