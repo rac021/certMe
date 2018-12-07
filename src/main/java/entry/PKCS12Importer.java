@@ -21,7 +21,6 @@ import java.util.UUID;
  * into a regular JKS format keystore for use with java based SSL applications, etc. 
 
 /**
- *
  * @author ryahiaoui
  */
 
@@ -103,3 +102,4 @@ public class PKCS12Importer {
    }
 
 }
+
