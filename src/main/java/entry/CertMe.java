@@ -351,7 +351,7 @@ public class CertMe {
         
         File f = new File( dir.getAbsoluteFile() + "/" + challenge.getToken() ) ;
         
-        System.out.println(" Created Fil.. Location : " + f.getPath() )         ;
+        print(" Created Fil.. Location : " + f.getPath() )            ;
         
         Files.write(Paths.get(f.getPath()), challenge.getAuthorization().getBytes()) ;
         
@@ -395,11 +395,11 @@ public class CertMe {
         message.append("_acme-challenge.")
                .append(auth.getIdentifier()
                .getDomain()).append(". IN TXT ")
-               .append(challenge.getDigest())            ;
+               .append(challenge.getDigest())             ;
         
-        // acceptChallenge(message.toString());
+        // acceptChallenge(message.toString()) ;
 
-        return challenge;
+        return challenge ;
     }
 
     /**
@@ -452,9 +452,9 @@ public class CertMe {
      *    @param targetChalengeToResolve
      */
     public static void resolveChallengeAndFetchCert( String domain , 
-                                                     String targetChalengeToResolve ) {
+                                                     String targetChalengeToResolve )     {
         
-        double version = Double.valueOf(System.getProperty("java.specification.version"));
+        double version = Double.valueOf(System.getProperty("java.specification.version")) ;
 
         if ( version == 1.8 ) {
             // Command to install cacerts in /etc/ssl/certs/java
@@ -463,14 +463,14 @@ public class CertMe {
             boolean minVarsion_111 = System.getProperty("java.runtime.version")
 		                           .contains("0_111")                 ;
             
-            if (minVarsion_111 )                                                       {
+            if (minVarsion_111 )                                                   {
                     
-                    String randoPass = UUID.randomUUID().toString()                    ;
-                    System.out.println(" Set properties ... Location : cacerts ")      ;
-                    System.setProperty("javax.net.ssl.trustStore", "cacerts")          ;
-                    System.setProperty("javax.net.ssl.trustStorePassword", "changeit") ;
-                    System.setProperty("javax.net.ssl.keyStorePassword", randoPass)    ;
-                    System.out.println(" Generated Password : " + randoPass)           ;
+                String randoPass = UUID.randomUUID().toString()                    ;
+                print(" Set properties ... Location : cacerts ")                   ;
+                System.setProperty("javax.net.ssl.trustStore", "cacerts")          ;
+                System.setProperty("javax.net.ssl.trustStorePassword", "changeit") ;
+                System.setProperty("javax.net.ssl.keyStorePassword", randoPass)    ;
+                print(" Generated Password : " + randoPass)                        ;
             } 
                 
         }
@@ -500,12 +500,12 @@ public class CertMe {
         String domainCert =  DOMAIN_CHAIN_FILE.getAbsolutePath() ;
         String domainKey  =  DOMAIN_KEY_FILE.getAbsolutePath()   ;
         
-        System.out.println(" ====================================== " ) ;
-        System.out.println(" domainCert path --> " + domainCert       ) ;
-        System.out.println(" domainKey  path --> " + domainKey        ) ;
-        System.out.println(" pkcs12File path --> " + certificate      ) ;
-        System.out.println(" password        -->  **********        " ) ;
-        System.out.println(" ====================================== " ) ;
+        print(" ====================================== " )       ;
+        print(" domainCert path --> " + domainCert       )       ;
+        print(" domainKey  path --> " + domainKey        )       ;
+        print(" pkcs12File path --> " + certificate      )       ;
+        print(" password        -->  **********        " )       ;
+        print(" ====================================== " )       ;
 
         /* Openssl command. Must be already installed on the machine */
         
@@ -542,39 +542,44 @@ public class CertMe {
      
     // Print the command
     private static void printCommand(String[] command) {
-       System.out.println( "                       " ) ;
-       System.out.println(Arrays.toString(command)   ) ;
-       System.out.println( "                       " ) ;
+       print( "                       " )              ;
+       print(Arrays.toString(command)   )              ;
+       print( "                       " )              ;
     }
     
     private static void printHelp() {
         
-      System.out.println("                                                                                                          " ) ;
-      System.out.println(" -domain          =  your_domain ( if not provided, it will be automatically processed )                  " ) ;
-      System.out.println(" -challenge       =  Where the challenge will be generated ( must be reacheable from the web on port 80 ) " ) ;
-      System.out.println("                     EX : /war/www/html                                                                   " ) ;
-      System.out.println(" -outCertificate  =  output certificate ( include int the path the name of the certificate )              " ) ;
-      System.out.println(" -password        =  password of the PKCS12 File                                                          " ) ;
-      System.out.println(" -phrase          =  password of the JKS File ( if not provided, it will be the same as -password )       " ) ;
-      System.out.println(" -staging         =  Generate DEV / PROD Certificates ( By default : DEV )                                " ) ;
-      System.out.println("                     Nb : Only 50 PROD certificates are generated / Week                                  " ) ;
-      System.out.println(" -jks             =  Import PKS12 into JKS  ( Java KeyStore ), ( Boolean. Disabled by default )           " ) ;
-      System.out.println(" -alias           =  alias of the cert in the keystore                                                    " ) ;
-      System.out.println("                                                                                                          " ) ;
-      System.out.println(" ** Requirements  : openssl installed + server reacheable from the web on the port 80                     " ) ;
-      System.out.println("                                                                                                          " ) ;
-      System.out.println("  Ex Command      :  java -jar certMe.jar            \\                                                   " ) ;
-      System.out.println("                          -outCertificate /opt/      \\                                                   " ) ;
-      System.out.println("                          -challenge /war/www/html   \\                                                   " ) ;
-      System.out.println("                          -password crackeme         \\                                                   " ) ;
-      System.out.println("                          -staging  PROD             \\                                                   " ) ;
-      System.out.println("                          -alias jaxy                \\                                                   " ) ;
-      System.out.println("                          -jks  -alias jaxy                                                               " ) ;
-      System.out.println("                                                                                                          " ) ;
-      System.exit(0)                                                                                                                    ;
+      print("                                                                                                          " ) ;
+      print(" -domain          =  your_domain ( if not provided, it will be automatically processed )                  " ) ;
+      print(" -challenge       =  Where the challenge will be generated ( must be reacheable from the web on port 80 ) " ) ;
+      print("                     EX : /war/www/html                                                                   " ) ;
+      print(" -outCertificate  =  output certificate ( include int the path the name of the certificate )              " ) ;
+      print(" -password        =  password of the PKCS12 File                                                          " ) ;
+      print(" -phrase          =  password of the JKS File ( if not provided, it will be the same as -password )       " ) ;
+      print(" -staging         =  Generate DEV / PROD Certificates ( By default : DEV )                                " ) ;
+      print("                     Nb : Only 50 PROD certificates are generated / Week                                  " ) ;
+      print(" -jks             =  Import PKS12 into JKS  ( Java KeyStore ), ( Boolean. Disabled by default )           " ) ;
+      print(" -alias           =  alias of the cert in the keystore                                                    " ) ;
+      print("                                                                                                          " ) ;
+      print(" ** Requirements  : openssl installed + server reacheable from the web on the port 80                     " ) ;
+      print("                                                                                                          " ) ;
+      print("  Ex Command      :  java -jar certMe.jar            \\                                                   " ) ;
+      print("                          -outCertificate /opt/      \\                                                   " ) ;
+      print("                          -challenge /war/www/html   \\                                                   " ) ;
+      print("                          -password crackeme         \\                                                   " ) ;
+      print("                          -staging  PROD             \\                                                   " ) ;
+      print("                          -alias jaxy                \\                                                   " ) ;
+      print("                          -jks  -alias jaxy                                                               " ) ;
+      print("                                                                                                          " ) ;
+      System.exit(0)                                                                                                       ;
     }
     
-  /**
+    private static void print( String message ) {
+        
+        System.out.println(message )            ;
+    }
+    
+    /**
      * Invokes this Client.
      *
      * @param args
@@ -675,4 +680,3 @@ public class CertMe {
         
     }
 }
-
