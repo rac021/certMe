@@ -619,13 +619,13 @@ public class CertMe {
             }
         }
         
-        if( destChallenge   == null ) destChallenge = "/var/www/html/"   ;
+        if( destChallenge   == null )  destChallenge = "/var/www/html/"   ;
         
-        if( domain          == null )  domain       = getDomain()        ;  
+        if( domain          == null )  domain       = getDomain()         ;  
         
-        if( phrase   == null        ) phrase = password                  ;
+        if( phrase          == null )  phrase = password                  ;
         
-        if( domain == null ||  password == null )  {  printHelp()   ;    }
+        if( domain  == null ||  password == null )  {  printHelp()   ;    }
         
         String outCertificateFolder   = new File(CertMe.class.getProtectionDomain()
                                                              .getCodeSource()
@@ -680,3 +680,4 @@ public class CertMe {
         
     }
 }
+
