@@ -47,19 +47,19 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider ;
 
 public class CertMe {
     
-    // File name of the User Key Pair
+    /** File name of the User Key Pair.      */
     private static  File USER_KEY_FILE        ;
 
-    // File name of the Domain Key Pair
+    /** File name of the Domain Key Pair.    */
     private static  File DOMAIN_KEY_FILE      ;
 
-    // File name of the CSR
+    /** File name of the CSR0.               */
     private static  File DOMAIN_CSR_FILE      ;
 
-    // File name of the signed certificate
+    /** File name of the signed certificate. */
     private static  File DOMAIN_CHAIN_FILE    ;
 
-    // RSA key size of generated key pairs
+    /** RSA key size of generated key pairs. */
     private static final int KEY_SIZE = 4096  ;
 
     private static String   STAGING   = "DEV" ;
@@ -67,7 +67,7 @@ public class CertMe {
    
     private enum ChallengeType { HTTP, DNS    }
     
-    // Challenge type to be used
+    /** Challenge type to be used. */
     private static final ChallengeType CHALLENGE_TYPE = ChallengeType.HTTP   ;
     
     private static final Logger LOG = LoggerFactory.getLogger(CertMe.class ) ;
@@ -85,7 +85,7 @@ public class CertMe {
     private void fetchCertificate( Collection<String> domains, 
                                    String targetChallengeToResolve ) throws Exception {
         
-        // Load the user key file. If there is no key file, create a new one.
+        /** Load the user key file. If there is no key file, create a new one. */
         KeyPair userKeyPair = loadOrCreateUserKeyPair() ;
 
         Session session = null ;
@@ -97,49 +97,51 @@ public class CertMe {
            session = new Session("acme://letsencrypt.org/staging") ;
         }
         
-        // Get the Account.
-        // If there is no account yet, create a new one.
+        /** Get the Account 
+         If there is no account yet, create a new one. */
         Account acct = findOrRegisterAccount(session, userKeyPair) ;
 
-        // Load or create a key pair for the domains. This should not be the userKeyPair!
+        /** Load or create a key pair for the domains
+            This should not be the userKeyPair! .  */
         KeyPair domainKeyPair = loadOrCreateDomainKeyPair() ;
 
-        // Order the certificate
+        /** Order the certificate. */
         Order order = acct.newOrder().domains(domains).create() ;
 
-        // Perform all required authorizations
+        /** Perform all required authorizations. */
         for (Authorization auth : order.getAuthorizations()) {
             authorize(auth, targetChallengeToResolve )       ;
         }
 
-        // Generate a CSR for all of the domains, and sign it with the domain key pair.
+        /** Generate a CSR for all of the domains, and sign it 
+            with the domain key pair.     */
         CSRBuilder csrb = new CSRBuilder() ;
         csrb.addDomains(domains)           ;
         csrb.sign(domainKeyPair)           ;
 
-        // Write the CSR to a file, for later use.
+        /** Write the CSR to a file, for later use. */
         try (Writer out = new FileWriter(DOMAIN_CSR_FILE)) {
             csrb.write(out) ;
         }
 
-        // Order the certificate
+        /** Order the certificate.      */
         order.execute(csrb.getEncoded()) ;
 
-        // Wait for the order to complete
+        /** Wait for the order to complete. */
         try {
             
             int attempts = 10 ;
             
             while (order.getStatus() != Status.VALID && attempts-- > 0 )  {
-                // Did the order fail ?
+                /** Did the order fail ? . */
                 if (order.getStatus() == Status.INVALID) {
                     throw new AcmeException("Order failed... Giving up.") ;
                 }
 
-                // Wait for a few seconds
+                /** Wait for a few seconds. */
                 TimeUnit.SECONDS.sleep(3) ;
 
-                // Then update the status
+                /** Then update the status. */
                 order.update()            ;
             }
             
@@ -148,7 +150,7 @@ public class CertMe {
             Thread.currentThread().interrupt()  ;
         }
 
-        // Get the certificate
+        /** Get the certificate. */
         Certificate certificate = order.getCertificate() ;
 
         if( certificate == null )
@@ -157,17 +159,17 @@ public class CertMe {
         LOG.info("Success! The certificate for domains " + domains + " has been generated ! ") ;
         LOG.info("Certificate URL : " + certificate.getLocation())                             ;
 
-         //Write a combined file containing the certificate and chain.
+        /** Write a combined file containing the certificate and chain. */
         try ( FileWriter fw = new FileWriter(  DOMAIN_CHAIN_FILE ) ) {
             certificate.writeCertificate(fw) ;
         }
     }
     
     /**
-     * Loads a user key pair from {@value #USER_KEY_FILE}. If the file does not 
-     * exist, a new key pair is generated and saves
+     * Loads a user key pair from {@value #USER_KEY_FILE}, If the file does not 
+     * exist, a new key pair is generated and saves 
      * Keep this key pair in a safe place! In a production environment, 
-     * you will not be able to access your account again if you should lose 
+     * you will not be able to access your account again if you should lose  
      * the key pair.
      *
      * @return User's {@link KeyPair}.
@@ -175,13 +177,13 @@ public class CertMe {
     private KeyPair loadOrCreateUserKeyPair( ) throws IOException {
         
         if ( (USER_KEY_FILE).exists())                            {
-            // If there is a key file, read it
+            /** If there is a key file, read it. */
             try (FileReader fr = new FileReader(USER_KEY_FILE))   {
                 return KeyPairUtils.readKeyPair(fr) ;
             }
 
         } else {
-            // If there is none, create a new key pair and save it
+            /** If there is none, create a new key pair and save it.  */
             KeyPair userKeyPair = KeyPairUtils.createKeyPair(KEY_SIZE) ;
             try (FileWriter fw = new FileWriter(USER_KEY_FILE))        {
                  KeyPairUtils.writeKeyPair(userKeyPair, fw)            ;
@@ -191,7 +193,7 @@ public class CertMe {
     }
 
     /**
-     * Loads a domain key pair from {@value #DOMAIN_KEY_FILE}. 
+     * Loads a domain key pair from {@value #DOMAIN_KEY_FILE},  
      * If the file does not exist, a new key pair is generated
      * and saved.
      *
@@ -226,11 +228,11 @@ public class CertMe {
      */
     private Account findOrRegisterAccount(Session session, KeyPair accountKey) throws AcmeException {
        
-       // Ask the user to accept the TOS, if server provides us with a link.
-       // URI tos = session.getMetadata().getTermsOfService();
-       // if ( tos != null )      {
-       //    acceptAgreement(tos) ;
-       // }
+       /** Ask the user to accept the TOS, if server provides us with a link 
+        URI tos = session.getMetadata().getTermsOfService();
+        if ( tos != null )      { 
+           acceptAgreement(tos) ; 
+        } .  */
 
         Account account = new AccountBuilder().agreeToTermsOfService()
                                               .useKeyPair(accountKey)
@@ -241,9 +243,8 @@ public class CertMe {
         return account ;
     }
 
-    /**
-     * Authorize a domain. It will be associated with your account, so you will be 
-     * able to retrieve a signed certificate for the domain later.
+    /** Authorize a domain, It will be associated with your account, so you will be 
+     * able to retrieve a signed certificate for the domain later . 
      *
      * @param auth
      * {@link Authorization} to perform
@@ -252,12 +253,12 @@ public class CertMe {
     
         LOG.info("Authorization for domain " + auth.getIdentifier().getDomain()) ;
 
-        // The authorization is already valid. No need to process a challenge.
+        /** The authorization is already valid, No need to process a challenge . */
         if (auth.getStatus() == Status.VALID) {
             return ;
         }
 
-        // Find the desired challenge and prepare it.
+        /** Find the desired challenge and prepare it. */
         Challenge challenge = null ;
         
         switch (CHALLENGE_TYPE)    {
@@ -275,27 +276,28 @@ public class CertMe {
             throw new AcmeException("No challenge found") ;
         }
 
-        // If the challenge is already verified, there's no need to execute it again.
+        /** If the challenge is already verified, there's no need to 
+         *  execute it again. */
         if (challenge.getStatus() == Status.VALID) {
             return ;
         }
 
-        // Now trigger the challenge.
+        /** Now trigger the challenge. */
         challenge.trigger() ;
 
-        // Poll for the challenge to complete.
+        /** Poll for the challenge to complete. */
         try {
             int attempts = 15 ;
             while (challenge.getStatus() != Status.VALID && attempts-- > 0 )  {
-                // Did the authorization fail?
+                /** Did the authorization fail? . */
                 if (challenge.getStatus() == Status.INVALID) {
                     throw new AcmeException("Challenge failed... Giving up.") ;
                 }
 
-                // Wait for a few seconds
+                /** Wait for a few seconds. */
                 TimeUnit.SECONDS.sleep(3) ;
 
-                // Then update the status
+                /** Then update the status. */
                 challenge.update()        ;
             }
         } catch (InterruptedException ex) {
@@ -303,7 +305,7 @@ public class CertMe {
             Thread.currentThread().interrupt() ;
         }
 
-        // All reattempts are used up and there is still no valid authorization?
+        /** All reattempts are used up and there is still no valid authorization ?. */
         if (challenge.getStatus() != Status.VALID) {
             throw new AcmeException("Failed to pass the challenge for domain "  + 
                          auth.getIdentifier().getDomain() + ", ... Giving up.") ;
@@ -319,14 +321,14 @@ public class CertMe {
      * @throws java.lang.Exception
      */
     public Challenge httpChallenge(Authorization auth , String targetFolder ) throws Exception  {
-        // Find a single http-01 challenge
+        /** Find a single http-01 challenge. */
         Http01Challenge challenge = auth.findChallenge(Http01Challenge.TYPE) ;
         if (challenge == null) {
             throw new AcmeException( "Found no " + Http01Challenge.TYPE      +
                                      " challenge, don't know what to do...") ;
         }
 
-        // Output the challenge, wait for acknowledge...
+        /** Output the challenge, wait for acknowledge... */
         LOG.info("Please create a file in your web server's base directory.") ;
         LOG.info( "It must be reachable at: http://" + auth.getIdentifier().getDomain() +
                   "/.well-known/acme-challenge/" + challenge.getToken()) ;
@@ -355,7 +357,7 @@ public class CertMe {
         
         Files.write(Paths.get(f.getPath()), challenge.getAuthorization().getBytes()) ;
         
-        // acceptChallenge(message.toString()) ;
+        /** acceptChallenge(message.toString()) ; . */
 
         return challenge ;
     }
@@ -363,7 +365,7 @@ public class CertMe {
     /**
      * Prepares a DNS challenge.
      * <p>
-     * The verification of this challenge expects a TXT record with a certain content.
+     * The verification of this challenge expects a TXT record with a certain content. 
      * <p>
      * This example outputs instructions that need to be executed manually. 
      * In a production environment, you would rather configure your DNS automatically.
@@ -376,19 +378,19 @@ public class CertMe {
     
     public Challenge dnsChallenge(Authorization auth) throws AcmeException   {
         
-        // Find a single dns-01 challenge
+        /** Find a single dns-01 challenge. */
         Dns01Challenge challenge = auth.findChallenge(Dns01Challenge.TYPE)   ;
         if (challenge == null) {
             throw new AcmeException( "Found no " + Dns01Challenge.TYPE +
                                      " challenge, don't know what to do...") ;
         }
 
-        // Output the challenge, wait for acknowledge...
+        /** Output the challenge, wait for acknowledge... */
         LOG.info( "Please create a TXT record:") ;
         LOG.info( "_acme-challenge." + auth.getIdentifier().getDomain()+ ". IN TXT " 
                   + challenge.getDigest()) ;
 
-        // LOG.info("If you're ready, dismiss the dialog...") ;
+        /** LOG.info("If you're ready, dismiss the dialog...") ; . */
 
         StringBuilder message = new StringBuilder()       ;
         message.append("Please create a TXT record:\n\n") ;
@@ -397,7 +399,7 @@ public class CertMe {
                .getDomain()).append(". IN TXT ")
                .append(challenge.getDigest())             ;
         
-        // acceptChallenge(message.toString()) ;
+        /** acceptChallenge(message.toString()) ; .      */
 
         return challenge ;
     }
@@ -413,8 +415,8 @@ public class CertMe {
             throw new AcmeException("User cancelled the challenge");
         }
     }
-    /* Presents the user a link to the Terms of Service, and asks for confirmation.
-       If the user denies confirmation, an exception is thrown. */
+    /** Presents the user a link to the Terms of Service, and asks for confirmation 
+       If the user denies confirmation, an exception is thrown . */
     /*
     public void acceptAgreement(URI agreement) throws AcmeException {
         int option = JOptionPane.showConfirmDialog(null, "Do you accept the Terms of Service?\n\n" + agreement,
@@ -489,7 +491,12 @@ public class CertMe {
         }
     }
     
-    // Convert and Register Cert in P12 format
+    /** Convert and Register Cert in P12 format.
+     * @param certificate
+     * @param password
+     * @param alias
+     * @param jks
+     * @throws java.io.IOException */
     public static void convAndRegisterP12Cert( String  certificate , 
                                                String  password    , 
                                                String  alias       ,
@@ -507,7 +514,7 @@ public class CertMe {
         print(" password        -->  **********        " )       ;
         print(" ====================================== " )       ;
 
-        /* Openssl command. Must be already installed on the machine */
+        /** Openssl command; Must be already installed on the machine. */
         
         String[] cmd = new String[] { "openssl"          ,
                                       "pkcs12"           ,
@@ -530,7 +537,7 @@ public class CertMe {
     }
 
      
-    // Execute the commands
+    /** Execute the commands. */
     private static void execute(String[] command) {
         try {
             printCommand(command)                 ;
@@ -540,7 +547,7 @@ public class CertMe {
         }
     }
      
-    // Print the command
+    /** Print the command. */
     private static void printCommand(String[] command) {
        print( "                       " )              ;
        print(Arrays.toString(command)   )              ;
@@ -660,16 +667,16 @@ public class CertMe {
            outCertificateFolder = outCertificateFolder.trim() + File.separator  ;
         }
 
-         // File name of the User Key Pair
+         /** File name of the User Key Pair. */
         USER_KEY_FILE = new File( outCertificateFolder   + outCertificateFileName +"_user.key")     ;
 
-        // File name of the Domain Key Pair
+        /** File name of the Domain Key Pair. */
         DOMAIN_KEY_FILE = new File( outCertificateFolder + outCertificateFileName + "_domain.key")  ;
 
-        // File name of the CSR
+        /** File name of the CSR. */
         DOMAIN_CSR_FILE = new File( outCertificateFolder + outCertificateFileName + "_domain.csr")  ;
 
-        // File name of the signed certificate
+        /** File name of the signed certificate. */
         DOMAIN_CHAIN_FILE = new File( outCertificateFolder + outCertificateFileName + "_domain-chain.crt")      ;
         
         destChallenge = destChallenge.endsWith(File.separator) ? destChallenge : destChallenge + File.separator ;
