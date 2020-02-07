@@ -351,9 +351,9 @@ public class CertMe {
         dir = new File(targetFolder + ".well-known/acme-challenge/" ) ;
         dir.mkdir()                                                   ;
         
-        File f = new File( dir.getAbsoluteFile() + "/" + challenge.getToken() ) ;
+        File f = new File( dir.getAbsoluteFile() + "/" + challenge.getToken() )      ;
         
-        print(" Created Fil.. Location : " + f.getPath() )            ;
+        print(" Created File.. Location : " + f.getPath() )                          ;
         
         Files.write(Paths.get(f.getPath()), challenge.getAuthorization().getBytes()) ;
         
