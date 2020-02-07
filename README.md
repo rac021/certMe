@@ -52,9 +52,9 @@ Automatic generation of let's Encrypt Certificates
 
 ** Requirements  : openssl installed + server reacheable from the web on the port 80
 
-Ex Command       :  java -jar certMe.jar          \
+Ex Command       :  java -jar certMe.jar           \
                           -outCertificate /opt/    \
-                          -challenge /war/www/html \
+                          -challenge /var/www/html \
                           -password crackeme       \
                           -staging  PROD           \
                           -alias jaxy              \
