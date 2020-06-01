@@ -33,14 +33,14 @@ Let's Encrypt Automatic Certificate generator tool
   Generate **APP.p12** + **APP.jks** Certificates for the domain **myDomain** in the directory : **letsEncrypt_Cert**
 
 ```
-  ❯ java -jar certMe.jar                    \
-         -out letsEncrypt_Cert/             \
-         -password_pkcs12 myPkcs12Password  \
-         -password_jks    myJksPassword     \
-         -staging  PROD                     \
-         -alias myAppAlias                  \
-         -port 80                           \
-         -domain myDomain                   \
+  ❯ java -jar certMe-1.0-jar-with-dependencies.jar  \
+         -out letsEncrypt_Cert/                     \
+         -password_pkcs12 myPkcs12Password          \
+         -password_jks    myJksPassword             \
+         -staging  PROD                             \
+         -alias myAppAlias                          \
+         -port 80                                   \
+         -domain myDomain                           \
          -jks  
   
   ```
@@ -69,14 +69,14 @@ Let's Encrypt Automatic Certificate generator tool
 
 ** Requirements  : openssl installed.
 
-Ex Command       : java -jar certMe.jar                   \
-                        -out letsEncrypt_Cert/             \
-                        -password_pkcs12 myPkcs12Password  \
-                        -password_jks    myJksPassword     \
-                        -staging  PROD                     \
-                        -alias myAppAlias                  \
-                        -port 80                           \
-                        -domain myDomain                   \
+Ex Command       : java -jar certMe-1.0-jar-with-dependencies.jar \
+                        -out letsEncrypt_Cert/                    \
+                        -password_pkcs12 myPkcs12Password         \
+                        -password_jks    myJksPassword            \
+                        -staging  PROD                            \
+                        -alias myAppAlias                         \
+                        -port 80                                  \
+                        -domain myDomain                          \
                         -jks 
 ```
 
