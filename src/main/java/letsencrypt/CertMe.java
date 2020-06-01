@@ -753,14 +753,7 @@ public class CertMe {
      */
     public static void main(String... args ) throws Exception      {
 
-        Level level = checkLog( "INFO") ;
-        
-        Configurator.setRootLevel( level )                         ;
-        Configurator.setAllLevels( "certMe_configuration", level ) ;
-        
-        String jVersion = System.getProperty("java.version")       ;
-
-        LOG.info("Java Version : " + jVersion )                    ;
+        Level level = checkLog( "INFO" ) ;
         
         String  domain           = null  , 
                 passwordPkcs12   = null  ,
@@ -802,6 +795,14 @@ public class CertMe {
             }
         }
         
+        Configurator.setRootLevel( level )                         ;
+        Configurator.setAllLevels( "certMe_configuration", level ) ;
+        
+        String jVersion = System.getProperty("java.version")       ;
+
+        LOG.info("Java Version : " + jVersion )                    ;
+        
+        
         if( domain  == null )  domain = getDomain()        ;  
 
         LOG.info( "Domain : [[ " + domain  + " ]] " )      ;
@@ -810,8 +811,8 @@ public class CertMe {
             passwordPkcs12 = ( UUID.randomUUID().toString() +
                                UUID.randomUUID().toString() )
                                .replace( "-", "")           ;
-            LOG.info( "Generated PkCs12 Password : " +
-                      passwordPkcs12 )               ;
+            LOG.info( "Generated PkCs12 Password : "        +
+                      passwordPkcs12 )                      ;
         }  
         
         if( passwordJks == null && jks  ) {
@@ -877,7 +878,7 @@ public class CertMe {
       
         
          /** File name of the User Key Pair. */
-        USER_KEY_FILE = new File( outCertificateFolder     +  outCertificateFileName + "_user.key")         ;
+        USER_KEY_FILE = new File( outCertificateFolder     + outCertificateFileName  + "_user.key")         ;
 
         /** File name of the Domain Key Pair. */
         DOMAIN_KEY_FILE = new File( outCertificateFolder   + outCertificateFileName  + "_domain.key")       ;
