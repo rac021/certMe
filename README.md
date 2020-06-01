@@ -51,7 +51,7 @@ Let's Encrypt Automatic Certificate generator tool
   ❯ java -jar target/certMe.jar -help
  ```
 
-![certMe-Cmd](https://user-images.githubusercontent.com/7684497/83450268-3f560980-a455-11ea-8b37-aca5af00ee9a.jpg)
+![certMe-Cmd](https://user-images.githubusercontent.com/7684497/83452856-c9a06c80-a459-11ea-984e-b1d68ed00a0c.jpg)
 
 
 - [**Arguments**](https://user-images.githubusercontent.com/7684497/83450268-3f560980-a455-11ea-8b37-aca5af00ee9a.jpg) :
