@@ -1,69 +1,65 @@
-# certMe
-Automatic generation of let's Encrypt Certificates
 
 
-- **Install procedure** :
+# CoreseInfer
 
-   - ` mvn clean install assembly:single `
-   
-   
-- **Requirements** : 
+inferred triples Generator
 
-  `openssl installed  + A server reacheable from the web on the port 80 or 443 ( if tls is activated )`
-
-
-- **Command Example** :
-
-```
-  ❯ java -jar certMe.jar          \
-         -outCertificate /opt/    \
-         -challenge /war/www/html \
-         -password crackeme       \
-         -staging  PROD           \
-         -alias my_app            \
-         -jks  
-```
+| Branch    | build status  |
+|-----------|---------------|
+| [master](https://github.com/rac021/CoreseInfer/tree/master)  |[![Build Status](https://travis-ci.org/ontop/ontop.svg?branch=master)](https://travis-ci.org/rac021/CoreseInfer)|
 
 
-- **Help Command** :
+Steps : 
 
- ```
-  ❯ java -jar target/certMe.jar -help
- ```
-![certme](https://user-images.githubusercontent.com/7684497/49657828-def13200-fa40-11e8-8f21-57cfc394be3b.png)
+ **1-** `mvn clean install assembly:single `
 
-
-- **Arguments** :
- ```
--domain         =  your_domain ( if not provided, it will be automatically processed )
--challenge      =  Where the challenge will be generated ( must be reacheable from the web on port 80 )
-                   EX : /war/www/html                   
--outCertificate =  Where certificates will be generated ( include name of the certificate in the path ).
--password       =  password of the PKCS12 File.
--phrase         =  password of the JKS File 
-                   ( optional, if not provided, it will be the same as the -password ).
--password       =  password of the PKCS12 File.
--phrase         =  password of the JKS File
-                   ( optional, if not provided, it will be the same as the -password ).
--staging        =  Generate DEV / PROD Certificates ( By default : DEV ).
-                   Nb : Only 50 PROD certificates are generated / Week
--jks            =  Import PKS12 into JKS  ( Java KeyStore ), ( Boolean. Disabled by default ).
--alias          = alias of the cert in the keystore
-
-** Requirements  : openssl installed + server reacheable from the web on the port 80
-
-Ex Command       :  java -jar certMe.jar           \
-                          -outCertificate /opt/    \
-                          -challenge /var/www/html \
-                          -password crackeme       \
-                          -staging  PROD           \
-                          -alias jaxy              \
-                          -jks  -alias jaxy     
-```
-
-**Upcoming Features :**
-
-    - Get rid of OpenSSL
-    - Get rid of the web server 
+ **2- Arguments :**
+ 
+    - owl : owl path file.  ( Required if -nt is Empty ) 
     
+    - ttl : turtle path file.  ( Required if -owl is Empty ) 
     
+    - out : output path file.  ( Required )
+    
+    - q   : Sparql Query.  ( Required )
+    
+    - f   : Fragment ( nbr triples by file )  if = 0 no fragmentation. ( Required )
+    
+    - F   : output Format ( ttl, xml, csv ). ( Required )
+    
+    - e   : enable entailment if "t" , default FALSE. ( not Required )
+    
+  **3- Example :**
+  
+ ```
+❯     java -Xms1024M -Xmx2048M -cp CoreseInferMaven-1.0.0-jar-with-dependencies.jar corese.Main \
+
+      -owl ontology.owl  -ttl  data.rdf                                                         \
+      
+      -q " SELECT DISTINCT ?S ?P ?O { ?S ?P ?O } "                                              \
+      
+      -out out/coreseInferedTriples.ttl  -f  100000  -F  ttl                                    \
+      
+      -q " PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>                                 \
+      
+           PREFIX : <http://www.anaee/fr/soere/ola#>                                            \
+           
+           PREFIX oboe-core: <http://ecoinformatics.org/oboe/oboe.1.0/oboe-core.owl#>           \
+           
+           SELECT ?uriVariableSynthesis ?measu ?value  {                                        \
+           
+              ?uriVariableSynthesis a oboe-core:Observation ;                                   \
+           
+              oboe-core:ofEntity :VariableSynthesis ; oboe-core:hasMeasurement ?measu .         \
+           
+              ?measu oboe-core:hasValue ?value .                                                \
+              
+              Filter ( regex( ?value, 'ph', 'i'))                                               \
+             
+           } "                                                                                  \
+           
+      -out out/portail/coreseInferedTriples.ttl  -f  0  -F  xml                                 \
+           
+      -e
+
+```
