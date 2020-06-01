@@ -38,3 +38,4 @@ ENTRYPOINT ["java", "-jar", "certMe-1.0-jar-with-dependencies.jar"]
 #                  -port 80                                                                                               \
 #                  -jks                                                                                                   \
 #                  -password_jks ABCDEF
+
