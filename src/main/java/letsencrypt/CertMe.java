@@ -906,11 +906,13 @@ public class CertMe {
        return toLevel                                       ;
     }
      
-    private static String toUppCase( String fileName )  {
+    private static String toUppCase( String fileName )    {
         
        if( fileName.contains( ".")) {
-         return fileName.split(Pattern.quote( "."), 2)[0].toUpperCase() + 
-                "." + fileName.split(Pattern.quote( "."), 2 )[1]        ;
+	       
+         return fileName.split( Pattern.quote( "."), 2 )[0]
+		                    .toUpperCase()  + "."  +
+                fileName.split(Pattern.quote( "."), 2 )[1] ;
        }
 
        return fileName ;
