@@ -31,18 +31,6 @@ Let's Encrypt Automatic Certificate generator tool
 - **Command Example** :
 
   Generate **APP.p12** + **APP.jks** Certificates for the domain **myDomain** in the directory : **letsEncrypt_Cert**
- 
-```
-
- - Domain               :  If not provided, it will be automatically processed
- - Pkcs12 Cert Password :  myPkcs12Password
- - Jks    Cert Password :  myJksPassword
- - Server Port          :  80   ( Default : 80  , if not provided  )
- - Staging              :  Prod ( Default : Dev , if not provided  )
- - jks                  :  Generate Also Jks Cert ( APP.jks        )
- - out                  :  Out Folder ( Default : letsEncrypt_Cert , if not provided )
- 
- ```
 
 ```
   ❯ java -jar certMe.jar                    \
