@@ -69,7 +69,7 @@ Let's Encrypt Automatic Certificate generator tool
 
 ** Requirements  : openssl installed.
 
-Ex Command       : java -jar certMe.jar                    \
+Ex Command       : java -jar certMe.jar                   \
                         -out letsEncrypt_Cert/             \
                         -password_pkcs12 myPkcs12Password  \
                         -password_jks    myJksPassword     \
