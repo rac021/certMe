@@ -77,7 +77,7 @@ Ex Command       : java -jar certMe.jar                    \
                         -alias myAppAlias                  \
                         -port 80                           \
                         -domain myDomain                   \
-                        -jks    
+                        -jks 
 ```
 
 **Upcoming Features :**
