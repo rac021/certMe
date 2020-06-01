@@ -25,21 +25,37 @@ Let's Encrypt Automatic Certificate generator tool
    
 - **Requirements** : 
 
-  `openssl installed  + A server reacheable from the web on the port 80 or 443 ( if tls is activated )`
+  `openssl installed  + root privileges in order to use the port 80 `
 
 
 - **Command Example** :
 
-```
-  ❯ java -jar certMe.jar          \
-         -outCertificate /opt/    \
-         -challenge /war/www/html \
-         -password crackeme       \
-         -staging  PROD           \
-         -alias my_app            \
-         -jks  
+  Generate **APP.p12** + **APP.jks** Certificates for the domain **myDomain** in the directory : **letsEncrypt_Cert**
+ 
 ```
 
+ - Domain               :  If not provided, it will be automatically processed
+ - Pkcs12 Cert Password :  myPkcs12Password
+ - Jks    Cert Password :  myJksPassword
+ - Server Port          :  80   ( Default : 80  , if not provided  )
+ - Staging              :  Prod ( Default : Dev , if not provided  )
+ - jks                  :  Generate Also Jks Cert ( APP.jks        )
+ - out                  :  Out Folder ( Default : letsEncrypt_Cert , if not provided )
+ 
+ ```
+
+```
+  ❯ java -jar certMe.jar                    \
+         -out letsEncrypt_Cert/             \
+         -password_pkcs12 myPkcs12Password  \
+         -password_jks    myJksPassword     \
+         -staging  PROD                     \
+         -alias myAppAlias                  \
+         -port 80                           \
+         -domain myDomain                   \
+         -jks  
+  
+  ```
 
 - **Help Command** :
 
@@ -51,30 +67,27 @@ Let's Encrypt Automatic Certificate generator tool
 
 - **Arguments** :
  ```
--domain         =  your_domain ( if not provided, it will be automatically processed )
--challenge      =  Where the challenge will be generated ( must be reacheable from the web on port 80 )
-                   EX : /war/www/html                   
--outCertificate =  Where certificates will be generated ( include name of the certificate in the path ).
--password       =  password of the PKCS12 File.
--phrase         =  password of the JKS File 
-                   ( optional, if not provided, it will be the same as the -password ).
--password       =  password of the PKCS12 File.
--phrase         =  password of the JKS File
-                   ( optional, if not provided, it will be the same as the -password ).
--staging        =  Generate DEV / PROD Certificates ( By default : DEV ).
-                   Nb : Only 50 PROD certificates are generated / Week
--jks            =  Import PKS12 into JKS  ( Java KeyStore ), ( Boolean. Disabled by default ).
--alias          = alias of the cert in the keystore
+-domain           =  your_domain ( if not provided, it will be automatically processed )
+-out              =  Where certificates will be generated ( include name of the certificate in the path ).
+-password_pkcs12  =  password of the PKCS12 File ( if not provided, it will be generated using UUID     )
+-pawword_jks      =  password of the JKS File 
+                     ( optional, if not provided, it will be the same as the -password_pkcs12 ).
+-staging          =  Generate DEV / PROD Certificates ( By default : DEV ).
+                     Nb : Only 50 PROD certificates are generated / Week
+-jks              =  Import PKS12 into JKS  ( Java KeyStore ), ( Boolean. Disabled by default ).
+-alias            = alias of the Jks Cert in the keystore
 
-** Requirements  : openssl installed + server reacheable from the web on the port 80
+** Requirements  : openssl installed.
 
-Ex Command       :  java -jar certMe.jar           \
-                          -outCertificate /opt/    \
-                          -challenge /var/www/html \
-                          -password crackeme       \
-                          -staging  PROD           \
-                          -alias jaxy              \
-                          -jks  -alias jaxy     
+Ex Command       : java -jar certMe.jar                    \
+                        -out letsEncrypt_Cert/             \
+                        -password_pkcs12 myPkcs12Password  \
+                        -password_jks    myJksPassword     \
+                        -staging  PROD                     \
+                        -alias myAppAlias                  \
+                        -port 80                           \
+                        -domain myDomain                   \
+                        -jks    
 ```
 
 **Upcoming Features :**
