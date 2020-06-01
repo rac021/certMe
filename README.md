@@ -86,4 +86,3 @@ Ex Command       : java -jar certMe-1.0-jar-with-dependencies.jar \
    - Get rid of OpenSSL
    - ~~Get rid of the web server~~
     
-    
