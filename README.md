@@ -54,7 +54,7 @@ Let's Encrypt Automatic Certificate generator tool
 ![certMe-Cmd](https://user-images.githubusercontent.com/7684497/83450268-3f560980-a455-11ea-8b37-aca5af00ee9a.jpg)
 
 
-- [**Arguments**](https://user-images.githubusercontent.com/7684497/49657828-def13200-fa40-11e8-8f21-57cfc394be3b.png) :
+- [**Arguments**](https://user-images.githubusercontent.com/7684497/83450268-3f560980-a455-11ea-8b37-aca5af00ee9a.jpg) :
  ```
 -domain           =  your_domain ( if not provided, it will be automatically processed )
 -out              =  Where certificates will be generated ( include name of the certificate in the path ).
