@@ -25,7 +25,7 @@ Let's Encrypt Automatic Certificate generator tool
    
 - **Requirements** : 
 
-  `openssl installed  + root privileges in order to use the port 80 `
+   - `openssl installed  + root privileges in order to use the port 80 `
 
 
 - **Command Example** :
