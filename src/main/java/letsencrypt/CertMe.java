@@ -785,10 +785,14 @@ public class CertMe {
                case "-jks"             :  jks             = true      ; break ;                
                case "-interface"       :  interfce        = args[i+1] ; break ;                
                case "-alias"           :  alias           = args[i+1] ; break ;               
-               case "-help"            :  printHelp()                 ; break ; 
+               case "-h"               :
+               case "-H"               :
                case "-port"            :  port            = Integer.parseInt  (
-                                                           args[i+1]) ; 
-                                                           break      ;                
+                                                            args[i+1]) ; 
+                                                            break      ;    
+               case "-help"            :  printHelp()     ; System.exit( 0)   ;
+                                                           break ;
+              
             }
         }
         
