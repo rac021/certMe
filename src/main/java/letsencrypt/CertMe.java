@@ -23,6 +23,7 @@ import io.undertow.Undertow ;
 import java.net.InetAddress ;
 import java.security.KeyPair ;
 import java.security.Security ;
+import java.util.regex.Pattern ;
 import io.undertow.util.Headers ;
 import org.shredzone.acme4j.Order ;
 import java.net.InetSocketAddress ;
@@ -43,7 +44,6 @@ import io.undertow.server.HttpServerExchange ;
 import org.shredzone.acme4j.util.KeyPairUtils ;
 import org.shredzone.acme4j.challenge.Challenge ;
 import java.nio.file.attribute.PosixFilePermission ;
-import java.util.regex.Pattern;
 import org.shredzone.acme4j.exception.AcmeException ;
 import org.shredzone.acme4j.challenge.Dns01Challenge ;
 import org.shredzone.acme4j.challenge.Http01Challenge ;
@@ -113,13 +113,13 @@ public class CertMe {
             LOG.error( " ") ;
             LOG.error( ex.getMessage(), ex )   ;
             
-            if( port < 1024 ) {
+            if( port < 1024 )   {
             LOG.error( "Need to be Root To "
                      + "start the Server on "
                      + "the Port : " + port )  ;
             }
-            LOG.error( " ")  ;
-            System.exit( 2 ) ;
+            LOG.error( " ")     ;
+            System.exit( 2 )    ;
         }
     }
 
