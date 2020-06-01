@@ -1,6 +1,22 @@
 # certMe
-Automatic generation of let's Encrypt Certificates
+Let's Encrypt Automatic Certificate generator tool
 
+----------
+
+### * Using Docker Command  : 
+ - Ex : ( Generate **APP.p12** + **APP.jks** Certificates for the domain **myDomain** in the directory : **letsEncrypt_Cert** ) 
+```
+ sudo docker run --rm --name cert-me -p 80:80                                \
+                 -v $(pwd)/letsEncrypt_Cert:/usr/src/myapp/letsEncrypt_Cert/ \
+                 rac021/cert-me                                              \
+                 -domain myDomain.com -jks
+ 
+```
+* **Nb** : Need to have **Root privileges** in roder to use the port **80**
+
+----------
+
+### * Using Standalone tool :
 
 - **Install procedure** :
 
