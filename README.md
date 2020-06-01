@@ -63,7 +63,7 @@ Ex Command       :  java -jar certMe.jar           \
 
 **Upcoming Features :**
 
-    - Get rid of OpenSSL
-    - Get rid of the web server 
+   - Get rid of OpenSSL
+   - ~~Get rid of the web server~~
     
     
