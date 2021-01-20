@@ -9,7 +9,7 @@ Let's Encrypt Automatic Certificate generator tool
  sudo docker run --rm --name cert-me -p 80:80                                \
                  -v $(pwd)/letsEncrypt_Cert:/usr/src/myapp/letsEncrypt_Cert/ \
                  rac021/cert-me                                              \
-                 -domain myDomain.com -jks staging PROD 
+                 -domain myDomain.com -jks -staging PROD 
  
 ```
 * **Nb** : Need to have **Root privileges** in roder to use the port **80**
