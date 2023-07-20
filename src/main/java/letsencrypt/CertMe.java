@@ -49,6 +49,7 @@ import org.shredzone.acme4j.challenge.Dns01Challenge ;
 import org.shredzone.acme4j.challenge.Http01Challenge ;
 import org.apache.logging.log4j.core.config.Configurator ;
 import org.bouncycastle.jce.provider.BouncyCastleProvider ;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -95,28 +96,26 @@ public class CertMe {
         try {
             
              LOG.info("Starting The Server on Port ( " + interfce + ":" + port  + " ) Using HTTP  ") ;
-             Undertow.Builder builder = Undertow.builder()                         ;
-             builder.addHttpListener( port, interfce )                             ;
+             Undertow.Builder builder = Undertow.builder()                          ;
+             builder.addHttpListener( port, interfce )                              ;
              
-             server = builder.setHandler(( final HttpServerExchange exchange ) ->  {
+             server = builder.setHandler(( final HttpServerExchange exchange ) ->   {
                                          exchange.setRequestPath( "/.well-known/acme-challenge/"              ) ;
                                          exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain" ) ;
                                          exchange.getResponseSender().send( challenge.getAuthorization()      ) ;
                                          LOG.info( "Server Called ! ( Probably By Lest's Encrypt ) "          ) ;
-                              }).build() ;
+                              }).build()     ;
             
-            server.start()                     ;
+            server.start()                   ;
             
-            LOG.info("Server Started ! "   )   ;
+            LOG.info("Server Started ! "   ) ;
             
         } catch( Exception ex ) {
             LOG.error( " ") ;
-            LOG.error( ex.getMessage(), ex )   ;
+            LOG.error( ex.getMessage(), ex ) ;
             
             if( port < 1024 )   {
-            LOG.error( "Need to be Root To "
-                     + "start the Server on "
-                     + "the Port : " + port )  ;
+               LOG.error( "Need to be Root To Start the Server on the Port : " + port )  ;
             }
             LOG.error( " ")     ;
             System.exit( 2 )    ;
@@ -126,7 +125,7 @@ public class CertMe {
     private void stopServer() {
         LOG.info( "Stopping the Server.. " ) ;
         server.stop()                        ;
-        LOG.info( "Server Stoped !" )        ;
+        LOG.info( "Server Stoped !"        ) ;
     }
 
     private  static void authorizeAccessToAllCert( List<String> files ) throws IOException {
@@ -185,10 +184,10 @@ public class CertMe {
      * @throws java.io.IOException
      * @throws org.shredzone.acme4j.exception.AcmeException
      */
-    private void fetchCertificate( String domain , int port, String interfce ) throws Exception {
+    private void fetchCertificate( String domain , int port, String interfce , boolean renew ) throws Exception {
         
         /** Load the user key file. If there is no key file, create a new one. */
-        KeyPair userKeyPair = loadOrCreateUserKeyPair() ;
+        KeyPair userKeyPair = loadOrCreateUserKeyPair( renew ) ;
 
         Session session = null ;
         
@@ -233,23 +232,24 @@ public class CertMe {
         /** Wait for the order to complete. */
         try {
             
-            int attempts = 30 ;
+            int attempts = 60 ;
             
-            while (order.getStatus() != Status.VALID && attempts-- > 0 )  {
+            while (order.getStatus() != Status.VALID && attempts-- > 0 ) {
                 
                 /** Did the order fail ? . */
                 if (order.getStatus() == Status.INVALID) {
-                    LOG.error( "-+> " + order.getError().toString()     ) ;
-                    throw new AcmeException("Order failed... Giving up.") ;
+                    LOG.error( "-+> " + order.getError().toString()    ) ;
                 }
 
                 /** Wait for a few seconds. */
-                TimeUnit.SECONDS.sleep( 2 ) ;
+                TimeUnit.SECONDS.sleep( 2 )  ;
 
                 /** Then update the status. */
-                order.update()              ;
+                order.update()               ;
             }
-            
+            if ( order.getStatus() != Status.VALID && attempts-- > 0 ) {
+                 throw new AcmeException("Order failed... Giving up." ) ;
+            }
         } catch (InterruptedException ex)       {
             LOG.error( "interrupted", ex )      ;
             Thread.currentThread().interrupt()  ;
@@ -261,8 +261,8 @@ public class CertMe {
         if( certificate == null )
             throw new RuntimeException("Exeption when generating Certificate") ;
         
-        LOG.info("Success! The certificate for domain [[ " + domain + " ]] HAS BEEN GENERATED :-) ") ;
-        LOG.info("Certificate URL : " + certificate.getLocation())                                   ;
+        LOG.info("Success ! The certificate for domain [[ " + domain + " ]] Has Been Generated :-) ") ;
+        LOG.info("Certificate URL : " + certificate.getLocation())                                    ;
 
 
         /** Write a combined file containing the certificate and chain. */
@@ -282,19 +282,22 @@ public class CertMe {
      *
      * @return User's {@link KeyPair}.
      */
-    private KeyPair loadOrCreateUserKeyPair( ) throws IOException {
+    private KeyPair loadOrCreateUserKeyPair( boolean renew ) throws IOException {
         
-        if ( (USER_KEY_FILE).exists())                            {
+        if( renew && (USER_KEY_FILE).exists() ) {
+            LOG.info( "+ Renew the already existing KEY-PAIR : " + 
+                      USER_KEY_FILE.getAbsolutePath() )      ;
             /** If there is a key file, read it. */
-            try (FileReader fr = new FileReader(USER_KEY_FILE))   {
+            try (FileReader fr = new FileReader(USER_KEY_FILE)) {
                 return KeyPairUtils.readKeyPair(fr) ;
             }
-
         } else {
             /** If there is none, create a new key pair and save it.  */
+            LOG.info( "+ Create a new KEY PAIR : "       + 
+                      USER_KEY_FILE.getAbsolutePath() )  ;
             KeyPair userKeyPair = KeyPairUtils.createKeyPair(KEY_SIZE) ;
             try (FileWriter fw = new FileWriter(USER_KEY_FILE))        {
-                 KeyPairUtils.writeKeyPair(userKeyPair, fw)            ;
+                 KeyPairUtils.writeKeyPair(userKeyPair, fw )           ;
             }
             return userKeyPair ;
         }
@@ -371,14 +374,12 @@ public class CertMe {
         
         switch ( CHALLENGE_TYPE )  {
             
-            case HTTP :
-                challenge = httpChallenge(auth )                            ;
+            case HTTP -> {
+                challenge = httpChallenge(auth )                               ;
                 startServer( interfce , port , ( Http01Challenge ) challenge ) ;
-                break                                                       ;
+            }
 
-            case DNS :
-                challenge = dnsChallenge( auth ) ;
-                break                            ;
+            case DNS -> challenge = dnsChallenge( auth )   ;
         }
 
         if ( challenge == null ) {
@@ -551,7 +552,7 @@ public class CertMe {
      * @param port
      * @param interfce
      */
-    public static void resolveChallengeAndFetchCert( String domain, int port , String interfce ) {
+    public static void resolveChallengeAndFetchCert( String domain, int port , String interfce , boolean renew ) {
         
         double version = Double.valueOf(System.getProperty("java.specification.version")) ;
 
@@ -573,13 +574,13 @@ public class CertMe {
             } 
         }
 
-        LOG.info("Starting up...")                           ;
+        LOG.info("Starting up...")                         ;
 
-        Security.addProvider(new BouncyCastleProvider())     ;
+        Security.addProvider(new BouncyCastleProvider())   ;
         
         try {
-             CertMe ct = new CertMe()                        ;
-             ct.fetchCertificate( domain , port , interfce ) ;
+             CertMe ct = new CertMe()                      ;
+             ct.fetchCertificate( domain , port , interfce , renew ) ;
         } catch (Exception ex) {
             LOG.error( " " )   ;
             LOG.error( "Failed to get a certificate for domain [[ " + 
@@ -718,16 +719,19 @@ public class CertMe {
       System.out.println("                                                                                                                 " ) ;
       System.out.println(" *** CertMe Args :                                                                                               " ) ;
       System.out.println("                                                                                                                 " ) ;
-      System.out.println("      -domain          =  your_domain ( if not provided, it will be automatically Resolved )                     " ) ;
-      System.out.println("      -out             =  Directory output certificate. Default : letsEncrypt_Cert                               " ) ;
-      System.out.println("      -password_pkcs12 =  password of the PKCS12 File. If Not Provived, it will be Generated using UUID          " ) ;
-      System.out.println("      -jks             =  Import PKS12 into JKS  ( Java KeyStore ), ( Boolean. Disabled by default )             " ) ;
-      System.out.println("      -password_jks    =  password of the JKS File ( if not provided, it will be the same as -password_pkcs12 )  " ) ;
-      System.out.println("      -staging         =  Generate DEV / PROD Certificates ( By default : DEV )                                  " ) ;
+      System.out.println("     -domain           =  your_domain ( if not provided, it will be automatically Resolved )                     " ) ;
+      System.out.println("     -out              =  Directory output certificate. Default : letsEncrypt_Cert                               " ) ;
+      System.out.println("     -password_pkcs12  =  password of the PKCS12 File. If Not Provived, it will be Generated using UUID          " ) ;
+      System.out.println("     -jks              =  Import PKS12 into JKS  ( Java KeyStore ), ( Boolean. Disabled by default )             " ) ;
+      System.out.println("     -password_jks     =  password of the JKS File ( if not provided, it will be the same as -password_pkcs12 )  " ) ;
+      System.out.println("     -staging          =  Generate DEV / PROD Certificates ( By default : DEV )                                  " ) ;
       System.out.println("                          Nb : Only 50 PROD certificates are generated / Week                                    " ) ;
-      System.out.println("      -alias           =  alias of the cert in the keystore                                                      " ) ;
-      System.out.println("      -port            =  Port of the Embedded Server  ( Default : 80 ) Need Root Privileges                     " ) ;
-      System.out.println("      -Help            =  Display Help                                                                           " ) ;
+      System.out.println("     -alias            =  alias of the cert in the keystore                                                      " ) ;
+      System.out.println("     -port             =  Port of the Embedded Server  ( Default : 80 ) Need Root Privileges                     " ) ;
+      System.out.println("     -renew            =  If a KEY-PAIR Already exists, then renew, else generate new one                        " ) ;
+      System.out.println("     -log / -log_level =  Set Log Level : WARN, TRACE, OFF, INFO, ERROR, DEBUG, ALL                              " ) ;
+      System.out.println("     -user_key_file    =  Path of USER_KEY_FILE. Used to Renew Existing Certificiate                             " ) ;
+      System.out.println("     -Help             =  Display Help                                                                           " ) ;
       System.out.println("                                                                                                                 " ) ;
       System.out.println(" ** Requirements       : OPENSSL installed + Root Privilege to launch the Server on the Port 80                  " ) ;
       System.out.println("                                                                                                                 " ) ;
@@ -739,7 +743,7 @@ public class CertMe {
       System.out.println("                               -staging         PROD                      \\                                     " ) ;
       System.out.println("                               -alias           certMeAlias               \\                                     " ) ;
       System.out.println("                               -domain          myDomain.com              \\                                     " ) ;
-      System.out.println("                               -jks                                                                              " ) ;
+      System.out.println("                               -jks -renew                                                                       " ) ;
       System.out.println("                                                                                                                 " ) ;
       System.exit( 0 )                                                                                                                         ;
     }
@@ -751,50 +755,49 @@ public class CertMe {
      *  Domains to get a certificate for
      * @throws java.lang.Exception
      */
-    public static void main(String... args ) throws Exception      {
-
-        Level level = checkLog( "INFO" ) ;
-        
+    public static void main(String... args ) throws Exception {
+     
         String  domain           = null  , 
                 passwordPkcs12   = null  ,
                 passwordJks      = null  ,
                 alias            = null  ,
+                userKeyFile      = null  ,
                 outCertificate   = null  ;
         
+        String logLevel          = "INFO"      ;
         int    port              = 80          ;
         String interfce          = "0.0.0.0"   ;
         
         boolean jks              = false       ;
+        boolean renew            = false       ;
      
        for ( int i = 0 ; i < args.length ; i++ ) {
             
         String token = args[i] ;
            
             switch(token)      {
-
-               case "-domain"          :  domain          = args[i+1] ; break ;
-               case "-password_pkcs12" :  passwordPkcs12  = args[i+1] ; break ;
-               case "-password_jks"    :  passwordJks     = args[i+1] ; break ;                
-               case "-outCertificate"  :                 
-               case "-outCertificates" :                 
-               case "-out"             :  outCertificate  = args[i+1] ; break ;                
-               case "-staging"         :  STAGING         = args[i+1] ; break ;                
-               case "-jks"             :  jks             = true      ; break ;                
-               case "-interface"       :  interfce        = args[i+1] ; break ;                
-               case "-alias"           :  alias           = args[i+1] ; break ;               
-
-               case "-port"            :  port            = Integer.parseInt  (
-                                                            args[i+1]) ; 
-                                                            break      ;    
-               case "-h"               :   
-               case "-H"               :   
-               case "-help"            :   
-               case "-HELP"            :  printHelp()     ; System.exit( 0 )  ;
-                                                            break             ;
-              
+               case "-domain"           -> domain          = args[i+1] ;
+               case "-password_pkcs12"  -> passwordPkcs12  = args[i+1] ;
+               case "-password_jks"     -> passwordJks     = args[i+1] ;
+               case "-staging"          ->  STAGING        = args[i+1] ;
+               case "-jks"              -> jks             = true      ;
+               case "-renew"            -> renew           = true      ;
+               case "-user_key_file"    -> userKeyFile     = args[i+1] ;
+               case "-interface"        -> interfce        = args[i+1] ;
+               case "-alias"            -> alias           = args[i+1] ;
+               case "-log_level","-log" -> logLevel        = args[i+1].trim()              ;
+               case "-port"             -> port            = Integer.parseInt  (args[i+1]) ;
+               case "-outCertificate"  , "-outCertificates", "-out" -> outCertificate = args[i+1] ;
+               case "-h", "-H", "-help", "-HELP" -> {
+                   printHelp() ; System.exit( 0 )   ;
+                }
             }
         }
+       
+        setSLF4JLogLevel(List.of("org.shredzone.acme4j", "org.jose4j") , logLevel) ;
         
+        Level level = checkLog( logLevel ) ;
+       
         Configurator.setRootLevel( level )                         ;
         Configurator.setAllLevels( "certMe_configuration", level ) ;
         
@@ -803,9 +806,12 @@ public class CertMe {
         LOG.info("Java Version : " + jVersion )                    ;
         
         
-        if( domain  == null )  domain = getDomain()        ;  
+        if( domain  == null )  domain = getDomain()         ;  
 
-        LOG.info( "Domain : [[ " + domain  + " ]] " )      ;
+        LOG.info( "Domain : [[ " + domain  + " ]] " )       ;
+        
+        LOG.info( "Mode   : [[ " + ( renew ? "Renew Certificate if Already Exists" : 
+                  "Generate New Certificate" )  + " ]] " )  ;
 
         if( passwordPkcs12 == null )  {
             passwordPkcs12 = ( UUID.randomUUID().toString() +
@@ -827,9 +833,9 @@ public class CertMe {
             LOG.info( "Alias  : " + alias ) ;
         }
         
-        if( domain  == null ||  passwordPkcs12 == null )  {  printHelp()   ;    }
+        if( domain  == null ||  passwordPkcs12 == null )  {  printHelp()   ; }
         
-        String outCertificateFolder   = outCertificate               ;
+        String outCertificateFolder   = outCertificate                     ;
        
         if( outCertificateFolder == null || outCertificateFolder.trim().isEmpty() ) {
             
@@ -849,8 +855,8 @@ public class CertMe {
             
             outCertificate  =  outCertificateFolder.endsWith( File.separator) ? 
                                outCertificateFolder + toUppCase(outCertificateFileName ) : 
-                               outCertificateFolder + File.separator         +
-                               toUppCase(outCertificateFileName )            ;
+                               outCertificateFolder + File.separator          +
+                               toUppCase(outCertificateFileName )             ;
             
         } else {
             
@@ -878,7 +884,17 @@ public class CertMe {
       
         
          /** File name of the User Key Pair. */
-        USER_KEY_FILE = new File( outCertificateFolder     + outCertificateFileName  + "_user.key")         ;
+        if( userKeyFile == null ) {
+            USER_KEY_FILE = new File( outCertificateFolder + outCertificateFileName  +
+                                      "_user.key") ;
+        } else {
+          LOG.info("Provided USER_KEY_FILE : "  +  userKeyFile ) ;
+          USER_KEY_FILE = new File( userKeyFile )                ;
+          if( ! USER_KEY_FILE.exists() ) {
+              throw new RuntimeException ( "Provided USER_KEY_FILE not "    +
+                                           "found at path : " + userKeyFile ) ;
+          }
+        }
 
         /** File name of the Domain Key Pair. */
         DOMAIN_KEY_FILE = new File( outCertificateFolder   + outCertificateFileName  + "_domain.key")       ;
@@ -890,11 +906,10 @@ public class CertMe {
         DOMAIN_CHAIN_FILE = new File( outCertificateFolder + outCertificateFileName  + "_domain-chain.crt") ;
         
         if( port != 80  )  {
-            LOG.warn( "For LetsEncrypt the Port "
-                    + "MUST BE  ( 80 )      " ) ;
+            LOG.warn( "For LetsEncrypt the Port MUST BE  ( 80 ) "      ) ;
         }
         
-        resolveChallengeAndFetchCert( domain ,  port, interfce )      ;
+        resolveChallengeAndFetchCert( domain ,  port, interfce , renew ) ;
         
         convAndRegisterP12Cert( outCertificate , 
                                 passwordPkcs12 , 
@@ -910,7 +925,22 @@ public class CertMe {
                            toLevel.name()                 ) ;
        return toLevel                                       ;
     }
-     
+    
+    private static void setSLF4JLogLevel(List<String> packages, String logLevel ) {
+        // Get the root logger context
+        ch.qos.logback.classic.LoggerContext loggerContext = 
+                 (ch.qos.logback.classic.LoggerContext) LoggerFactory.getILoggerFactory() ;
+        ch.qos.logback.classic.Level toLevel = 
+                 ch.qos.logback.classic.Level.toLevel(logLevel, ch.qos.logback.classic.Level.INFO ) ;
+        System.out.println("+ SLF4G Level = " + toLevel.levelStr ) ;
+        for (String ppackage : packages) {
+            // Get the logger for the package org.shredzone.acme4j
+            ch.qos.logback.classic.Logger logger = loggerContext.getLogger(ppackage.trim()) ;
+            // Set the log level to toLevel for the package
+            logger.setLevel( toLevel ) ;
+        }
+    }
+
     private static String toUppCase( String fileName )    {
         
        if( fileName.contains( ".")) {
