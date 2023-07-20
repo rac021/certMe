@@ -64,6 +64,9 @@ Let's Encrypt Automatic Certificate generator tool
 -staging          =  Generate DEV / PROD Certificates ( By default : DEV ).
                      Nb : Only 50 PROD certificates are generated / Week
 -jks              =  Import PKS12 into JKS  ( Java KeyStore ), ( Boolean. Disabled by default ).
+-log / -log_level =  Set Log Level : WARN, TRACE, OFF, INFO, ERROR, DEBUG, ALL.
+-user_key_file    =  Path of USER_KEY_FILE. Used to Renew Existing Certificiate.
+-renew            =  If a KEY-PAIR Already exists, then renew, else generate new one.
 -alias            =  alias of the Jks Cert in the keystore
 -port             =  port used by the server ( Must Be 80 for letsEncrypt Challenge )
 -interface        =  Interface of the Server ( default : 0.0.0.0                    )
