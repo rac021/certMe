@@ -3,7 +3,7 @@
 # Step : Compile  ######
 ########################
 
-FROM maven:3.6.3-openjdk-14-slim AS compilation_stage
+FROM maven:3.8.4-openjdk-17-slim AS compilation_stage
 
 ADD ./. /tmp
 
@@ -18,9 +18,9 @@ RUN export TERM=xterm && mvn clean install assembly:single
 # Step : Build  ######
 ########################
 
-FROM openjdk:14-alpine
+FROM openjdk:17-alpine
 
-COPY --from=compilation_stage /tmp/target/certMe-1.0-jar-with-dependencies.jar /usr/src/myapp/certMe-1.0-jar-with-dependencies.jar
+COPY --from=compilation_stage /tmp/target/certMe-1.1-jar-with-dependencies.jar /usr/src/myapp/certMe-1.1-jar-with-dependencies.jar
 
 RUN apk upgrade --update-cache --available && apk add openssl &&  rm -rf /var/cache/apk/*
 

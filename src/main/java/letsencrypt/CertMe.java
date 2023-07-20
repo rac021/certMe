@@ -717,7 +717,7 @@ public class CertMe {
     private static void printHelp() {
         
       System.out.println("                                                                                                                 " ) ;
-      System.out.println(" *** CertMe Args :                                                                                               " ) ;
+      System.out.println(" *** CertMe V 1.1 Args :                                                                                         " ) ;
       System.out.println("                                                                                                                 " ) ;
       System.out.println("     -domain           =  your_domain ( if not provided, it will be automatically Resolved )                     " ) ;
       System.out.println("     -out              =  Directory output certificate. Default : letsEncrypt_Cert                               " ) ;
