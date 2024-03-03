@@ -66,26 +66,26 @@ Let's Encrypt Automatic Certificate generator tool
 -jks              =  Import PKS12 into JKS  ( Java KeyStore ), ( Boolean. Disabled by default ).
 -log / -log_level =  Set Log Level : WARN, TRACE, OFF, INFO, ERROR, DEBUG, ALL.
 -user_key_file    =  Path of USER_KEY_FILE. Used to Renew Existing Certificiate.
--renew            =  If a KEY-PAIR Already exists, then renew, else generate new one.
+-reuse_key        =  If a KEY-PAIR Already exists, then reuse, else generate new one.
 -alias            =  alias of the Jks Cert in the keystore
 -port             =  port used by the server ( Must Be 80 for letsEncrypt Challenge )
 -interface        =  Interface of the Server ( default : 0.0.0.0                    )
 
 ** Requirements  : openssl installed.
 
-Ex Command       : java -jar certMe-1.0-jar-with-dependencies.jar \
-                         -out letsEncrypt_Cert/                    \
-                         -password_pkcs12 myPkcs12Password         \
-                         -password_jks    myJksPassword            \
-                         -staging  PROD                            \
-                         -alias myAppAlias                         \
-                         -port 80                                  \
-                         -domain myDomain                          \
-                         -jks 
+Ex Command   : java -jar certMe.jar                    \
+                    -out letsEncrypt_Cert/             \
+                    -password_pkcs12 myPkcs12Password  \
+                    -password_jks    myJksPassword     \
+                    -staging  PROD                     \
+                    -alias myAppAlias                  \
+                    -port 80                           \
+                    -domain myDomain                   \
+                    -jks 
 ```
 
 **Upcoming Features :**
 
-   - Get rid of OpenSSL
+   - Get rid of OpenSSL ( for pkcs12 cert )
    - ~~Get rid of the web server~~
     
